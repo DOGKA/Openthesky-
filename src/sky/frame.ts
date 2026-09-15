@@ -1,13 +1,19 @@
-import { clamp, DEG2RAD, getLocalSiderealTime, makeHorizontalTransform, type Horizontal } from "@/sky/math";
+import {
+  clamp,
+  DEG2RAD,
+  getLocalSiderealTime,
+  makeHorizontalTransform,
+  type HorizontalVec,
+} from "@/sky/math";
 import { loadSkyCatalog, type Constellation, type Star } from "./catalog";
 import { computeBodies, type Body } from "@/sky/ephemeris";
 
-export type FrameStar = Star & Horizontal;
-export type FrameBody = Body & Horizontal;
+export type FrameStar = Star & HorizontalVec;
+export type FrameBody = Body & HorizontalVec;
 
 export type FrameConstellation = Omit<Constellation, "lines"> & {
-  center: Horizontal;
-  lines: Horizontal[][];
+  center: HorizontalVec;
+  lines: HorizontalVec[][];
 };
 
 export type SkyFrame = {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import {
   Canvas,
@@ -12,7 +12,7 @@ import {
   vec,
 } from "@shopify/react-native-skia";
 import { GestureDetector } from "react-native-gesture-handler";
-import { GeistMono_400Regular } from "@expo-google-fonts/geist-mono";
+import { GeistMono_400Regular } from "@expo-google-fonts/geist-mono/400Regular";
 import { SKY } from "@/theme";
 import { makeAstrolicPath } from "@/astrolic-mark";
 import { buildScene } from "@/sky/scene";
@@ -24,11 +24,13 @@ import { StarField } from "./star-field";
 import { ZoomControls } from "./zoom-controls";
 import { FOV_MAX, FOV_MIN, NAME_FOV_MAX, RETICLE_SIZE, type TelescopeProps, type TelescopeState } from "./types";
 import { useCenteredObject } from "./centered-object";
+import { useReadoutReporter } from "./use-readout";
 import { useLiveLook, useTelescopeGestures } from "./use-telescope-gestures";
 
 export type { TelescopeReadout, TelescopeState, CenteredObject } from "./types";
 
-export function OpenSkyTelescope({
+/** Memoised: HUD readout updates must not re-render the whole canvas. */
+export const OpenSkyTelescope = memo(function OpenSkyTelescope({
   frame,
   sector,
   width,
@@ -63,10 +65,11 @@ export function OpenSkyTelescope({
   const centered = useCenteredObject(frame, view, locale);
   const reticle = useMemo(() => makeAstrolicPath(cx, cy, RETICLE_SIZE), [cx, cy]);
   const report = `${Math.round(view.alt0 * 573)}|${Math.round(view.az0 * 573)}|${view.fovDeg.toFixed(0)}|${scene.visibleCount}|${centered?.id ?? ""}`;
-
-  useEffect(() => {
-    onReadout?.({ ...view, magLimit, visibleCount: scene.visibleCount, centered });
-  }, [report, onReadout, magLimit, scene.visibleCount, centered, view]);
+  useReadoutReporter(
+    { ...view, magLimit, visibleCount: scene.visibleCount, centered },
+    report,
+    onReadout
+  );
 
   useLiveLook(live, look, setView);
   const gesture = useTelescopeGestures(view, setView, width, live, sector);
@@ -123,4 +126,4 @@ export function OpenSkyTelescope({
       </View>
     </GestureDetector>
   );
-}
+});

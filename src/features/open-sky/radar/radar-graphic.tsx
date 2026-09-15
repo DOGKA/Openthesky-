@@ -125,6 +125,3 @@ export function OpenSkyRadarGraphic({
     </Group>
   );
 }
-
-export { radarProject, radarRadiusForAlt } from "./geometry";
-export type { RadarGeometry } from "./geometry";
