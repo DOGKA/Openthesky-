@@ -1,10 +1,11 @@
 import { View } from "react-native";
 import { MonoText } from "@/components/mono-text";
-import { Divider, Fact, OutlineButton, Panel, SectionLabel } from "@/components/ui";
+import { Fact, OutlineButton, Panel, SectionLabel } from "@/components/ui";
 import { bodyName, constellationName, zodiacName, type SkyComparison } from "@/sky/insights";
 import { useLocale } from "@/providers/locale-provider";
 import { useNavigation } from "@/navigation/navigator";
 import type { BirthProfile, Observer } from "@/profiles";
+import { SharedConstellations } from "./shared-constellations";
 
 export function SameSkyFacts({
   cmp,
@@ -80,29 +81,7 @@ export function SameSkyFacts({
           }
         />
       </Panel>
-      <Panel>
-        <SectionLabel>{t("shared_constellations")}</SectionLabel>
-        <MonoText size={12} dim="soft">
-          {cmp.sharedConstellations.length
-            ? cmp.sharedConstellations.map((c) => constellationName(c, locale)).join(" · ")
-            : t("none")}
-        </MonoText>
-        {cmp.onlyA.length ? (
-          <>
-            <Divider />
-            <Fact
-              label={t("only_name", { name: a.name })}
-              value={cmp.onlyA.map((c) => constellationName(c, locale)).join(" · ")}
-            />
-          </>
-        ) : null}
-        {cmp.onlyB.length ? (
-          <Fact
-            label={t("only_name", { name: b.name })}
-            value={cmp.onlyB.map((c) => constellationName(c, locale)).join(" · ")}
-          />
-        ) : null}
-      </Panel>
+      <SharedConstellations cmp={cmp} aName={a.name} bName={b.name} />
       <Panel>
         <SectionLabel>{t("shared_planets")}</SectionLabel>
         <MonoText size={12} dim="soft">

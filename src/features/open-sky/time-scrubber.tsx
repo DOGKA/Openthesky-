@@ -88,11 +88,11 @@ export function OpenSkyTimeScrubber({
 
   return (
     <View style={{ width, gap: 8 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", paddingHorizontal: 16 }}>
-        <MonoText size={11} dim="soft" medium tracking={0.2}>
+      <View style={{ paddingHorizontal: 16, gap: 7 }}>
+        <MonoText size={11} dim="soft" medium tracking={0.2} numberOfLines={1}>
           {label}
         </MonoText>
-        <View style={{ flexDirection: "row", gap: 6 }}>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
           {presets.map((p) => {
             const active = Math.abs(p.offsetMs - offsetMs) < 60000;
             return (

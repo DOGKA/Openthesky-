@@ -13,10 +13,14 @@ export function useTelescopeGestures(
   live: boolean,
   sector: { alt0: number; az0: number; fovDeg: number }
 ) {
+  // Latest view kept in a ref so the gesture objects stay stable while a
+  // gesture is in flight; rebuilding them mid-pinch drops scale updates.
+  const viewRef = useRef(view);
+  viewRef.current = view;
   const startRef = useRef(view);
   const beginGesture = useCallback(() => {
-    startRef.current = view;
-  }, [view]);
+    startRef.current = viewRef.current;
+  }, []);
 
   const pan = useMemo(
     () =>
@@ -44,6 +48,7 @@ export function useTelescopeGestures(
         .runOnJS(true)
         .onStart(beginGesture)
         .onUpdate((e) => {
+          if (e.numberOfPointers < 2 || !e.scale) return;
           const start = startRef.current;
           setView((v) => ({ ...v, fovDeg: clamp(start.fovDeg / e.scale, FOV_MIN, FOV_MAX) }));
         }),
