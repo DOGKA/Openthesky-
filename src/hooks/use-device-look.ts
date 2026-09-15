@@ -6,8 +6,8 @@ import {
   lerpAz,
   type DeviceLook,
   type Vec3,
-} from "@/lib/sky/sky-look";
-import { clamp } from "@/lib/sky/sky-math";
+} from "@/sky/look";
+import { clamp } from "@/sky/math";
 
 export type DeviceLookState = {
   look: DeviceLook | null;

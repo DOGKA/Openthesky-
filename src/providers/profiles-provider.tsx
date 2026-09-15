@@ -1,12 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
-import {
-  EXAMPLE_PROFILES,
-  ProfilesContext,
-  type BirthProfile,
-  type ProfilesStore,
-} from "@/lib/profiles";
+import { EXAMPLE_PROFILES, ProfilesContext, type BirthProfile, type ProfilesStore } from "@/profiles";
 
-/** In-memory profile store for the prototype (Astrolic: profile + friendships queries). */
 export function ProfilesProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<BirthProfile[]>(EXAMPLE_PROFILES);
 

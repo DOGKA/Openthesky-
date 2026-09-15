@@ -11,14 +11,14 @@ npx expo start
 
 Then open in Expo Go (SDK 55) or a simulator. Location is requested on first sky open; Live mode needs a physical device (compass).
 
-## Stack
+## Layout
 
-- Expo 55 / React Native
-- `@shopify/react-native-skia` for stars and the story poster
-- `expo-location`, `expo-sensors` (DeviceMotion + magnetometer)
-- Star catalogue bundled in `assets/data/sky.json` (from [d3-celestial](https://github.com/ofrohn/d3-celestial) + HYG distances)
+- `src/i18n` — locale tables
+- `src/sky` — catalogue, math, ephemeris, scene projection
+- `src/features` — screens (home, open-sky, birth-sky, same-sky, profile)
+- `assets/data/sky.json` — bundled star catalogue from [d3-celestial](https://github.com/ofrohn/d3-celestial)
 
-Regenerate the catalogue (optional) from a checkout of d3-celestial:
+Regenerate the catalogue (optional):
 
 ```bash
 CELESTIAL_DATA=/path/to/d3-celestial/data npm run build:sky

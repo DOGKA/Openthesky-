@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { BackHandler } from "react-native";
-import type { Observer } from "@/lib/profiles";
+import type { Observer } from "@/profiles";
 
 /**
  * Minimal state-based stack for the prototype. In Astrolic these become

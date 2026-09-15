@@ -1,13 +1,13 @@
 import { View } from "react-native";
 import { NavigationProvider, useNavigation } from "@/navigation/navigator";
-import { useProfiles } from "@/lib/profiles";
-import { SKY } from "@/lib/theme";
-import { HomeView } from "@/sections/home/view/home-view";
-import { OpenSkyView } from "@/sections/open-sky/view/open-sky-view";
-import { BirthSkyView } from "@/sections/birth-sky/view/birth-sky-view";
-import { BirthSkyPosterView } from "@/sections/birth-sky/view/birth-sky-poster-view";
-import { SameSkyView } from "@/sections/compat/view/same-sky-view";
-import { ProfileFormView } from "@/sections/profile/view/profile-form-view";
+import { useProfiles } from "@/profiles";
+import { SKY } from "@/theme";
+import { HomeView } from "@/features/home/home-view";
+import { OpenSkyView } from "@/features/open-sky/open-sky-view";
+import { BirthSkyView } from "@/features/birth-sky/birth-sky-view";
+import { BirthSkyPosterView } from "@/features/birth-sky/birth-sky-poster-view";
+import { SameSkyView } from "@/features/same-sky/same-sky-view";
+import { ProfileFormView } from "@/features/profile/profile-form-view";
 
 export function AppRoot() {
   return (

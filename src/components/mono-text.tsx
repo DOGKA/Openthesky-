@@ -1,5 +1,5 @@
 import { Text, type TextProps, StyleSheet } from "react-native";
-import { MONO, MONO_MEDIUM, SKY } from "@/lib/theme";
+import { MONO, MONO_MEDIUM, SKY } from "@/theme";
 
 type Props = TextProps & {
   size?: number;
