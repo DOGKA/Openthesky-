@@ -37,3 +37,10 @@ export const FOV_MAX = 90;
 export const NAME_FOV_MAX = 40;
 export const RETICLE_SIZE = 64;
 export const BODY_LOCK_DEG = 3;
+export const ALT_MIN = -6 * (Math.PI / 180);
+export const ALT_MAX = 89.5 * (Math.PI / 180);
+/**
+ * The scene is built past the edges of the screen so a drag or a zoom out
+ * reveals real stars instead of empty space, as a fraction of the width.
+ */
+export const SCENE_OVERSCAN = 0.35;

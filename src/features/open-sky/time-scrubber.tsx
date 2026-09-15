@@ -31,6 +31,12 @@ export function OpenSkyTimeScrubber({
   localeTag,
   hint,
 }: Props) {
+  // Kept in refs so the gesture object stays stable: rebuilding it on every
+  // offset change means rebuilding it on every frame of the drag.
+  const offsetRef = useRef(offsetMs);
+  offsetRef.current = offsetMs;
+  const changeRef = useRef(onChange);
+  changeRef.current = onChange;
   const startRef = useRef(offsetMs);
   const pan = useMemo(
     () =>
@@ -38,12 +44,14 @@ export function OpenSkyTimeScrubber({
         .runOnJS(true)
         .minDistance(1)
         .onStart(() => {
-          startRef.current = offsetMs;
+          startRef.current = offsetRef.current;
         })
         .onUpdate((e) => {
-          onChange(Math.round((startRef.current - e.translationX * MS_PER_PX) / 60000) * 60000);
+          changeRef.current(
+            Math.round((startRef.current - e.translationX * MS_PER_PX) / 60000) * 60000
+          );
         }),
-    [onChange, offsetMs]
+    []
   );
 
   const ticks = useMemo(() => {
@@ -62,7 +70,9 @@ export function OpenSkyTimeScrubber({
     return out;
   }, [date, width]);
 
-  const label = useMemo(() => {
+  // Constructing an Intl formatter is expensive on Hermes, and the date here
+  // changes on every frame of a drag: build it once per locale instead.
+  const formatter = useMemo(() => {
     try {
       return new Intl.DateTimeFormat(localeTag, {
         weekday: "short",
@@ -72,11 +82,16 @@ export function OpenSkyTimeScrubber({
         hour: "2-digit",
         minute: "2-digit",
         hourCycle: "h23",
-      }).format(date);
+      });
     } catch {
-      return date.toISOString().slice(0, 16).replace("T", " ");
+      return null;
     }
-  }, [date, localeTag]);
+  }, [localeTag]);
+
+  const label = useMemo(
+    () => formatter?.format(date) ?? date.toISOString().slice(0, 16).replace("T", " "),
+    [formatter, date]
+  );
 
   const jump = useCallback(
     (ms: number) => {

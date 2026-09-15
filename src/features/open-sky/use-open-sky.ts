@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { nextBirthdayInstant, type BirthProfile, type Observer } from "@/profiles";
 import { useNow } from "@/hooks/use-now";
+import { useThrottled } from "@/hooks/use-throttled";
 import { useDeviceLook } from "@/hooks/use-device-look";
 import { useDeviceLocation } from "@/providers/device-location-provider";
 import { useSkyFrame } from "@/sky/use-sky-frame";
@@ -11,6 +12,9 @@ import type { TelescopeReadout } from "./telescope/types";
 import type { TimePreset } from "./time-scrubber";
 
 export const GRID_MAG_LIMIT = 4.5;
+
+/** Recompute the sky at most this often while the time scrubber is dragged. */
+const FRAME_THROTTLE_MS = 100;
 
 export const LIVE_SECTOR: SkySector = {
   id: "live",
@@ -32,7 +36,11 @@ export function useOpenSky(observer?: Observer, profile?: BirthProfile) {
   const [offsetMs, setOffsetMs] = useState(0);
   const base = observer?.date ?? now;
   const date = useMemo(() => new Date(base.getTime() + offsetMs), [base, offsetMs]);
-  const frame = useSkyFrame(latitude, longitude, date);
+  // The scrubber maps an hour to 72px, so a flick crosses dozens of minute
+  // ticks. Labels and ruler follow the finger; the sky catches up in steps.
+  const frameOffsetMs = useThrottled(offsetMs, FRAME_THROTTLE_MS);
+  const frameDate = useMemo(() => new Date(base.getTime() + frameOffsetMs), [base, frameOffsetMs]);
+  const frame = useSkyFrame(latitude, longitude, frameDate);
 
   const presets = useMemo<TimePreset[]>(() => {
     if (observer?.date && profile) {

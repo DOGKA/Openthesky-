@@ -1,6 +1,12 @@
 export { DEG2RAD, RAD2DEG, TWO_PI, clamp, normalizeAz, lerp, lerpAz, angularDistance } from "./angles";
 export { getLocalSiderealTime, julianDay, obliquity } from "./time";
-export { makeHorizontalTransform, type Horizontal, type HorizontalVec } from "./equatorial";
+export {
+  equatorialVector,
+  makeHorizontalRotation,
+  type EquatorialVec,
+  type Horizontal,
+  type HorizontalVec,
+} from "./equatorial";
 export { focalScale, magLimitForFov } from "./fov";
 export {
   STAR_BUCKETS,

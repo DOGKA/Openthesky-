@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n";
-import { DEG2RAD, starBucket, starColor, type StarBucket } from "@/sky/math";
+import { equatorialVector, starBucket, starColor, type EquatorialVec, type StarBucket } from "@/sky/math";
 import type { BodyData } from "@/sky/ephemeris";
 
 type RawStar = [ra: number, dec: number, mag: number, bv: number, ly: number, name?: string, desig?: string];
@@ -23,8 +23,10 @@ type RawSky = {
 export type Star = {
   ra: number;
   dec: number;
-  sinDec: number;
-  cosDec: number;
+  /** equatorial unit vector, so each frame is one rotation away */
+  ex: number;
+  ey: number;
+  ez: number;
   mag: number;
   bv: number;
   bucket: StarBucket;
@@ -40,7 +42,10 @@ export type Constellation = {
   ra: number;
   dec: number;
   names: Record<Locale, string>;
+  /** raw RA/Dec, kept for the figure glyphs */
   lines: [number, number][][];
+  centerVector: EquatorialVec;
+  lineVectors: EquatorialVec[][];
 };
 
 export type SkyCatalog = {
@@ -57,12 +62,13 @@ export function loadSkyCatalog(): SkyCatalog {
   const raw = require("../../assets/data/sky.json") as RawSky;
   cached = {
     stars: raw.stars.map(([ra, dec, mag, bv, ly, name, desig]) => {
-      const decRad = dec * DEG2RAD;
+      const v = equatorialVector(ra, dec);
       return {
         ra,
         dec,
-        sinDec: Math.sin(decRad),
-        cosDec: Math.cos(decRad),
+        ex: v.x,
+        ey: v.y,
+        ez: v.z,
         mag,
         bv,
         bucket: starBucket(mag),
@@ -72,7 +78,11 @@ export function loadSkyCatalog(): SkyCatalog {
         desig,
       };
     }),
-    constellations: raw.constellations,
+    constellations: raw.constellations.map((c) => ({
+      ...c,
+      centerVector: equatorialVector(c.ra, c.dec),
+      lineVectors: c.lines.map((poly) => poly.map(([ra, dec]) => equatorialVector(ra, dec))),
+    })),
     bodies: raw.bodies ?? [],
     magLimit: raw.meta.magLimit,
   };

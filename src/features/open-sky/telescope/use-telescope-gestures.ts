@@ -1,89 +1,95 @@
-import { useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAction } from "react";
+import { useMemo } from "react";
 import { Gesture } from "react-native-gesture-handler";
-import { clamp, DEG2RAD, focalScale, normalizeAz } from "@/sky/math";
-import { FOV_MAX, FOV_MIN, type TelescopeState } from "./types";
+import { runOnJS, useSharedValue } from "react-native-reanimated";
+import { DEG2RAD } from "@/sky/math";
+import { ALT_MAX, ALT_MIN, FOV_MAX, FOV_MIN } from "./types";
+import type { TelescopeAim } from "./use-telescope-view";
 
-const ALT_MIN = -6 * DEG2RAD;
-const ALT_MAX = 89.5 * DEG2RAD;
+/** Shallowest cosine used to widen azimuth steps near the zenith. */
+const MIN_COS_ALT = 0.15;
 
+/**
+ * Pan, pinch and double tap entirely on the UI thread: every frame of a
+ * gesture only writes shared values, and the JS thread is woken once at the
+ * end to rebuild the scene for the new aim. The maths is inlined rather than
+ * imported because worklets cannot call ordinary JS helpers.
+ */
 export function useTelescopeGestures(
-  view: TelescopeState,
-  setView: Dispatch<SetStateAction<TelescopeState>>,
+  aim: TelescopeAim,
+  commit: (alt0: number, az0: number, fovDeg: number) => void,
   width: number,
   live: boolean,
   sector: { alt0: number; az0: number; fovDeg: number }
 ) {
-  // Latest view kept in a ref so the gesture objects stay stable while a
-  // gesture is in flight; rebuilding them mid-pinch drops scale updates.
-  const viewRef = useRef(view);
-  viewRef.current = view;
-  const startRef = useRef(view);
-  const beginGesture = useCallback(() => {
-    startRef.current = viewRef.current;
-  }, []);
+  const startAlt = useSharedValue(0);
+  const startAz = useSharedValue(0);
+  const startFov = useSharedValue(0);
 
   const pan = useMemo(
     () =>
       Gesture.Pan()
         .enabled(!live)
         .maxPointers(1)
-        .runOnJS(true)
         .minDistance(2)
-        .onStart(beginGesture)
+        .onStart(() => {
+          "worklet";
+          startAlt.value = aim.alt.value;
+          startAz.value = aim.az.value;
+          startFov.value = aim.fov.value;
+        })
         .onUpdate((e) => {
-          const start = startRef.current;
-          const scale = focalScale(start.fovDeg * DEG2RAD, width);
-          const dAlt = Math.atan(e.translationY / scale);
-          const alt0 = clamp(start.alt0 + dAlt, ALT_MIN, ALT_MAX);
-          const dAz =
-            Math.atan(e.translationX / scale) / Math.max(Math.cos((start.alt0 + alt0) / 2), 0.15);
-          setView((v) => ({ ...v, alt0, az0: normalizeAz(start.az0 + dAz) }));
+          "worklet";
+          const scale = width / 2 / Math.tan((startFov.value * DEG2RAD) / 2);
+          let alt = startAlt.value + Math.atan(e.translationY / scale);
+          if (alt < ALT_MIN) alt = ALT_MIN;
+          if (alt > ALT_MAX) alt = ALT_MAX;
+          const cosAlt = Math.cos((startAlt.value + alt) / 2);
+          aim.alt.value = alt;
+          aim.az.value =
+            startAz.value +
+            Math.atan(e.translationX / scale) / (cosAlt < MIN_COS_ALT ? MIN_COS_ALT : cosAlt);
+        })
+        .onFinalize(() => {
+          "worklet";
+          runOnJS(commit)(aim.alt.value, aim.az.value, aim.fov.value);
         }),
-    [beginGesture, width, live, setView]
+    [aim, commit, live, width, startAlt, startAz, startFov]
   );
 
   const pinch = useMemo(
     () =>
       Gesture.Pinch()
-        .runOnJS(true)
-        .onStart(beginGesture)
+        .onStart(() => {
+          "worklet";
+          startFov.value = aim.fov.value;
+        })
         .onUpdate((e) => {
+          "worklet";
           if (e.numberOfPointers < 2 || !e.scale) return;
-          const start = startRef.current;
-          setView((v) => ({ ...v, fovDeg: clamp(start.fovDeg / e.scale, FOV_MIN, FOV_MAX) }));
+          const next = startFov.value / e.scale;
+          aim.fov.value = next < FOV_MIN ? FOV_MIN : next > FOV_MAX ? FOV_MAX : next;
+        })
+        .onFinalize(() => {
+          "worklet";
+          runOnJS(commit)(aim.alt.value, aim.az.value, aim.fov.value);
         }),
-    [beginGesture, setView]
+    [aim, commit, startFov]
   );
 
   const doubleTap = useMemo(
     () =>
       Gesture.Tap()
-        .runOnJS(true)
+        .enabled(!live)
         .numberOfTaps(2)
         .onEnd(() => {
-          if (!live) setView({ alt0: sector.alt0, az0: sector.az0, fovDeg: sector.fovDeg });
+          "worklet";
+          aim.alt.value = sector.alt0;
+          aim.az.value = sector.az0;
+          aim.fov.value = sector.fovDeg;
+          runOnJS(commit)(sector.alt0, sector.az0, sector.fovDeg);
         }),
-    [sector, live, setView]
+    [aim, commit, live, sector]
   );
 
-  const gesture = useMemo(
-    () => Gesture.Simultaneous(pinch, pan, doubleTap),
-    [pan, pinch, doubleTap]
-  );
-  return gesture;
-}
-
-export function useLiveLook(
-  live: boolean,
-  look: { alt: number; az: number } | null,
-  setView: Dispatch<SetStateAction<TelescopeState>>
-) {
-  useEffect(() => {
-    if (!live || !look) return;
-    setView((v) => ({
-      ...v,
-      alt0: clamp(look.alt, ALT_MIN, ALT_MAX),
-      az0: look.az,
-    }));
-  }, [live, look, setView]);
+  return useMemo(() => Gesture.Simultaneous(pinch, pan, doubleTap), [pan, pinch, doubleTap]);
 }

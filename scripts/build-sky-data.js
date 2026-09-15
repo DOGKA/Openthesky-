@@ -28,8 +28,16 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * d3-celestial's data files. Set CELESTIAL_DATA to point at a checkout of it;
+ * the fallbacks cover the app living inside that repo or beside it.
+ */
 const DATA =
   process.env.CELESTIAL_DATA ||
+  [
+    path.join(__dirname, "..", "..", "data"),
+    path.join(__dirname, "..", "..", "d3-celestial", "data"),
+  ].find((dir) => fs.existsSync(path.join(dir, "constellations.json"))) ||
   path.join(__dirname, "..", "..", "data");
 const args = process.argv.slice(2);
 const magArg = args.find((a) => a.startsWith("--mag="));

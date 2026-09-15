@@ -64,6 +64,10 @@ export function buildScene(frame: SkyFrame, vp: Viewport, opts: SceneOptions): S
   };
   const toPx = (p: HorizontalVec) => project(p.vx, p.vy, p.vz);
   const inside = (x: number, y: number) => x >= left && x <= right && y >= top && y <= bottom;
+  // The margin exists so a drag has something to reveal; the star count in the
+  // HUD should still mean "on screen".
+  const onScreen = (x: number, y: number) =>
+    x >= left + margin && x <= right - margin && y >= top + margin && y <= bottom - margin;
 
   const points = emptyBuckets();
   const featured: SkyScene["featured"] = [];
@@ -75,7 +79,7 @@ export function buildScene(frame: SkyFrame, vp: Viewport, opts: SceneOptions): S
     if (s.vx * wx + s.vy * wy + s.vz * wz < cosCull) continue;
     const px = project(s.vx, s.vy, s.vz);
     if (!px || !inside(px.x, px.y)) continue;
-    visibleCount++;
+    if (onScreen(px.x, px.y)) visibleCount++;
     if (s.mag < FEATURE_MAG) featured.push({ x: px.x, y: px.y, star: s });
     else points[s.bucket].push(px);
     if (s.name) named.push({ x: px.x, y: px.y, star: s });

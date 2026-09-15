@@ -1,11 +1,14 @@
 import { View } from "react-native";
 import { MonoText } from "@/components/mono-text";
 import { Fact, OutlineButton, Panel, SectionLabel } from "@/components/ui";
-import { bodyName, constellationName, zodiacName, type SkyComparison } from "@/sky/insights";
+import { ConstellationGlyph } from "@/components/sky-glyph";
+import { constellationName, type SkyComparison } from "@/sky/insights";
 import { useLocale } from "@/providers/locale-provider";
 import { useNavigation } from "@/navigation/navigator";
 import type { BirthProfile, Observer } from "@/profiles";
+import { MoonPair } from "./moon-pair";
 import { SharedConstellations } from "./shared-constellations";
+import { SharedPlanets } from "./shared-planets";
 
 export function SameSkyFacts({
   cmp,
@@ -53,41 +56,31 @@ export function SameSkyFacts({
       <Panel>
         <SectionLabel>{t("rising_east")}</SectionLabel>
         {cmp.sameRising && cmp.risingA ? (
-          <Fact label="" value={t("both_rising", { name: constellationName(cmp.risingA, locale) })} big />
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <ConstellationGlyph id={cmp.risingA.id} size={38} />
+            <View style={{ flex: 1 }}>
+              <Fact label="" value={t("both_rising", { name: constellationName(cmp.risingA, locale) })} big />
+            </View>
+          </View>
         ) : (
-          <Fact
-            label=""
-            value={t("rising_two", {
-              a: cmp.risingA ? constellationName(cmp.risingA, locale) : "—",
-              b: cmp.risingB ? constellationName(cmp.risingB, locale) : "—",
-            })}
-          />
+          <View style={{ flexDirection: "row", gap: 16 }}>
+            {[
+              { c: cmp.risingA, name: a.name },
+              { c: cmp.risingB, name: b.name },
+            ].map(({ c, name }) => (
+              <View key={name} style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 10 }}>
+                {c ? <ConstellationGlyph id={c.id} size={32} /> : null}
+                <View style={{ flex: 1 }}>
+                  <Fact label={name} value={c ? constellationName(c, locale) : "—"} />
+                </View>
+              </View>
+            ))}
+          </View>
         )}
       </Panel>
-      <Panel>
-        <SectionLabel>{t("moon")}</SectionLabel>
-        <Fact
-          label=""
-          value={t("moon_two", {
-            a: cmp.moonA ? Math.round(cmp.moonA.illumination * 100) : "—",
-            b: cmp.moonB ? Math.round(cmp.moonB.illumination * 100) : "—",
-          })}
-          sub={
-            cmp.sameMoonSign && cmp.moonA
-              ? t("same_moon_sign", { sign: zodiacName(cmp.moonA.sign, locale) })
-              : [cmp.moonA ? zodiacName(cmp.moonA.sign, locale) : null, cmp.moonB ? zodiacName(cmp.moonB.sign, locale) : null]
-                  .filter(Boolean)
-                  .join(" · ")
-          }
-        />
-      </Panel>
+      <MoonPair cmp={cmp} aName={a.name} bName={b.name} />
       <SharedConstellations cmp={cmp} aName={a.name} bName={b.name} />
-      <Panel>
-        <SectionLabel>{t("shared_planets")}</SectionLabel>
-        <MonoText size={12} dim="soft">
-          {cmp.sharedPlanets.length ? cmp.sharedPlanets.map((p) => bodyName(p, locale)).join(" · ") : t("none")}
-        </MonoText>
-      </Panel>
+      <SharedPlanets bodies={cmp.sharedPlanets} />
       <OutlineButton
         label={t("open_telescope")}
         onPress={() => nav.push({ name: "sky", params: { observer: obsB, profileId: b.id } })}
