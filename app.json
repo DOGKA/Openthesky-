@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Open the Sky",
+    "slug": "open-the-sky",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#000000",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.astrolic.openthesky",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Open the Sky uses your location to compute which stars are above your horizon right now.",
+        "NSMotionUsageDescription": "Live mode uses the compass and tilt so the sky on screen matches where you point the phone."
+      }
+    },
+    "android": {
+      "package": "com.astrolic.openthesky",
+      "adaptiveIcon": {
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Open the Sky uses your location to compute which stars are above your horizon right now."
+        }
+      ],
+      "expo-sharing"
+    ]
+  }
+}
