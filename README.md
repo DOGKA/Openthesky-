@@ -1,121 +1,121 @@
 # Open the Sky
 
-An iOS and Android app that computes the real sky — not an illustration of it. Give it a place and a moment and it puts 5044 Hipparcos stars, 88 constellations, the Sun, the Moon and five planets where they actually stood, then lets you point a telescope at any patch of it, look up the sky of the minute you were born, and compare that sky with someone else's.
+Gerçek gökyüzünü hesaplayan bir iOS ve Android uygulaması — gökyüzünün bir çizimi değil. Ona bir yer ve bir an ver; 5044 Hipparcos yıldızını, 88 takımyıldızı, Güneş'i, Ay'ı ve beş gezegeni gerçekten durdukları yere koysun. Sonra gökyüzünün istediğin parçasına teleskopla bak, doğduğun dakikanın gökyüzünü aç, o gökyüzünü bir başkasınınkiyle karşılaştır.
 
-Everything is drawn with Skia from a bundled catalogue. No tiles, no network, no astrology service: the app does its own astronomy.
+Her şey pakete gömülü bir katalogdan Skia ile çiziliyor. Harita döşemesi yok, ağ isteği yok, astroloji servisi yok: uygulama kendi astronomisini kendi yapıyor.
 
-## What it does
+## Ne yapıyor
 
-### Home
+### Ana ekran
 
-Your profiles and your friends', a live count of how long the light from a given star has been travelling, the sky as it is right now for your location, and a language switch. Friend profiles scroll as a carousel.
+Kendi profillerin ve arkadaşlarınınki, seçilen yıldızın ışığının ne zamandır yolda olduğunu sayan canlı bir sayaç, bulunduğun yer için şu anki gökyüzü ve dil değiştirici. Arkadaş profilleri carousel gibi kayıyor.
 
-### Open the sky
+### Gökyüzünü aç
 
-The sky is cut into 17 sectors: one zenith cap above 70°, then eight compass directions in a high band (35°–70°) and eight in a low band (horizon–35°). The overview draws them as an azimuthal-equidistant radar — the horizon as the outer circle, the zenith at the centre — with the stars, constellation lines and planets of that moment. Tap a sector and it opens as a telescope:
+Gökyüzü 17 sektöre bölünüyor: 70°'nin üstünde tek bir başucu kapağı, sonra yüksek kuşakta (35°–70°) sekiz yön ve alçak kuşakta (ufuk–35°) sekiz yön. Genel görünüm bunları azimut-eşit uzaklıklı bir radar olarak çiziyor — dış çember ufuk, merkez başucu — o anın yıldızları, takımyıldız çizgileri ve gezegenleriyle. Bir sektöre dokun, teleskop olarak açılsın:
 
-- **Pan and pinch** to aim and zoom, the way a photo app behaves. A tighter field earns fainter stars: the magnitude limit slides from 4.2 at 75° down to 6.0 at 6°.
-- **Star rendering** follows brightness — a coloured disc from the star's B−V index, a glow that grows with magnitude, and diffraction spikes on the brightest few, so a wide field reads as a dusting and a tight one as a real eyepiece.
-- **Live mode** takes the aim from the phone's compass and motion sensors, so holding the phone up shows what is behind it. Needs a physical device.
-- **Time scrubber** drags the whole sky forward and backward, with jumps to your birth minute, now, and your next birthday.
-- **HUD** reads out altitude, azimuth, field of view, magnitude limit, local sidereal time and whatever object is currently centred in the reticle.
+- **Kaydır ve iki parmakla yakınlaştır**, bir fotoğraf uygulamasındaki gibi. Dar alan daha sönük yıldızları hak ediyor: kadir sınırı 75°'de 4.2'den 6°'de 6.0'a kayıyor.
+- **Yıldız çizimi** parlaklığı izliyor — B−V renk indisinden gelen renkli disk, kadirle büyüyen hâle ve en parlak birkaçında kırınım ışınları. Böylece geniş alan bir serpinti, dar alan gerçek bir mercek görüntüsü gibi okunuyor.
+- **Canlı mod** nişanı telefonun pusula ve hareket sensörlerinden alıyor; telefonu kaldırdığında arkasında kalan gökyüzünü gösteriyor. Gerçek cihaz gerekiyor.
+- **Zaman şeridi** tüm gökyüzünü ileri geri sürüklüyor; doğum dakikana, şimdiye ve bir sonraki doğum gününe atlama düğmeleriyle.
+- **HUD** yükseklik, azimut, görüş alanı, kadir sınırı, yerel yıldız zamanı ve nişangâhın ortasında duran nesneyi yazıyor.
 
-### Birth sky
+### Doğum gökyüzü
 
-The sky over your birthplace at your birth minute: the star that stood at your zenith and how far its light has travelled, the constellation rising in the east, the Moon's phase and sign, which planets were up, and whether it was night.
+Doğduğun yerin üstünde, doğduğun dakikadaki gökyüzü: başucunda duran yıldız ve ışığının kat ettiği yol, doğuda yükselen takımyıldız, Ay'ın evresi ve burcu, o an yukarıda olan gezegenler ve gece olup olmadığı.
 
 ### Poster
 
-The same sky composed as a 1080×1920 image you can share — the star field, the horizon, your name, the date and the coordinates.
+Aynı gökyüzü, paylaşılabilir 1080×1920 bir görsel olarak: yıldız alanı, ufuk, adın, tarih ve koordinatlar.
 
-### Same sky
+### Aynı gökyüzü
 
-Two profiles side by side: how much of their sky overlapped as a percentage, each one's zenith star and the angle between them, what was rising for each, both Moons with their real phase drawn, and the constellations split into shared, only-yours and only-theirs. Each constellation carries its own stick figure, projected from the catalogue lines rather than picked from an icon set.
+İki profil yan yana: gökyüzlerinin yüzde kaçının örtüştüğü, her birinin başucu yıldızı ve aralarındaki açı, her biri için doğuda yükselen takımyıldız, gerçek evresiyle çizilmiş iki Ay, ve takımyıldızların ortak / yalnız sende / yalnız onda diye ayrılmış hâli. Her takımyıldız, bir ikon setinden seçilmiş değil, katalog çizgilerinden izdüşürülmüş kendi şeklini taşıyor.
 
-## How the sky is computed
+## Gökyüzü nasıl hesaplanıyor
 
-| Step | Where | What happens |
+| Adım | Nerede | Ne oluyor |
 | --- | --- | --- |
-| Catalogue | `src/sky/catalog.ts` | 5044 stars to magnitude 6, 215 named, 88 constellations with 893 line vertices. Each star's equatorial unit vector is computed once at load. |
-| Sidereal time | `src/sky/math/time.ts` | Julian day, then Greenwich mean sidereal time plus longitude. |
-| Equatorial → horizontal | `src/sky/math/equatorial.ts` | One rotation built from local sidereal time and latitude, applied to the precomputed vectors. Returns altitude, azimuth and the horizontal unit vector. |
-| Telescope | `src/sky/scene/build.ts` | Gnomonic (tangent plane) projection: the view direction becomes a basis and each star is three dot products, with points behind the tangent plane culled by sign. |
-| Radar | `src/features/open-sky/radar` | Azimuthal equidistant: radius linear in 90° − altitude. |
-| Sun, Moon, planets | `src/sky/ephemeris` | Kepler elements solved per date for the planets, a low-order lunar series for the Moon's position, phase and illumination, and the ecliptic longitude reduced to a zodiac sign. |
+| Katalog | `src/sky/catalog.ts` | 6. kadire kadar 5044 yıldız, 215'i isimli, 88 takımyıldız ve 893 çizgi noktası. Her yıldızın ekvatoral birim vektörü yükleme anında bir kez hesaplanıyor. |
+| Yıldız zamanı | `src/sky/math/time.ts` | Jülyen günü, ardından Greenwich ortalama yıldız zamanı artı boylam. |
+| Ekvatoral → yatay | `src/sky/math/equatorial.ts` | Yerel yıldız zamanı ve enlemden kurulan tek bir döndürme, önceden hesaplanmış vektörlere uygulanıyor. Yükseklik, azimut ve yatay birim vektörünü döndürüyor. |
+| Teleskop | `src/sky/scene/build.ts` | Gnomonik (teğet düzlem) izdüşüm: bakış yönü bir eksen takımına dönüşüyor ve her yıldız üç skaler çarpıma iniyor; teğet düzlemin arkasında kalanlar işaretle eleniyor. |
+| Radar | `src/features/open-sky/radar` | Azimut-eşit uzaklık: yarıçap 90° − yükseklik ile doğrusal. |
+| Güneş, Ay, gezegenler | `src/sky/ephemeris` | Gezegenler için tarihe göre çözülen Kepler öğeleri, Ay'ın konumu, evresi ve aydınlanması için düşük dereceli bir seri, ve burca indirgenmiş ekliptik boylam. |
 
-## Stack
+## Teknoloji
 
-Expo SDK 55 on React Native 0.83, `@shopify/react-native-skia` for all 2D drawing, Gesture Handler and Reanimated for the interactions, `expo-location` for the observer, `expo-sensors` (DeviceMotion and Magnetometer) for Live mode, `expo-sharing` for the poster. TypeScript throughout, path alias `@/` to `src`.
+React Native 0.83 üstünde Expo SDK 55, tüm 2B çizim için `@shopify/react-native-skia`, etkileşimler için Gesture Handler ve Reanimated, gözlemci konumu için `expo-location`, canlı mod için `expo-sensors` (DeviceMotion ve Magnetometer), poster paylaşımı için `expo-sharing`. Baştan sona TypeScript; `@/` takma adı `src`'ye bakıyor.
 
-## Run it
+## Çalıştırma
 
 ```bash
 npm install
 npx expo start
 ```
 
-Press `i` for the iOS simulator or `a` for Android.
+iOS simülatörü için `i`, Android için `a`.
 
-### On a real phone
+### Gerçek telefonda
 
 ```bash
 npx expo start
 ```
 
-Scan the QR code with Expo Go (SDK 55) on the same Wi-Fi. A physical device is the only way to try Live mode, since the simulator has no compass. For a fair read on speed, start the server the way a shipped build behaves:
+QR kodunu aynı Wi-Fi ağındaki Expo Go (SDK 55) ile okut. Canlı modu yalnızca gerçek cihazda deneyebilirsin; simülatörde pusula yok. Hızı dürüstçe ölçmek için sunucuyu yayınlanmış bir yapı gibi başlat:
 
 ```bash
 npx expo start --no-dev --minify
 ```
 
-## Languages
+## Diller
 
-English, Turkish, German and Spanish, switchable from the home screen. Constellation, star, planet and zodiac names all come from the catalogue per locale; dates and numbers go through `Intl`.
+İngilizce, Türkçe, Almanca ve İspanyolca; ana ekrandan değiştiriliyor. Takımyıldız, yıldız, gezegen ve burç isimleri dile göre katalogdan geliyor; tarih ve sayılar `Intl` üzerinden biçimleniyor.
 
-## Regenerating the catalogue
+## Katalogu yeniden üretmek
 
-`assets/data/sky.json` (208 KB) is built from [d3-celestial](https://github.com/ofrohn/d3-celestial)'s data. Clone it next to this project and the script finds it:
+`assets/data/sky.json` (208 KB) [d3-celestial](https://github.com/ofrohn/d3-celestial) verilerinden üretiliyor. Onu bu projenin yanına klonlarsan betik kendisi buluyor:
 
 ```bash
 git clone https://github.com/ofrohn/d3-celestial.git ../d3-celestial
 npm run build:sky
 ```
 
-Anywhere else, point it there explicitly:
+Başka bir yerdeyse yolu açıkça ver:
 
 ```bash
 CELESTIAL_DATA=/path/to/d3-celestial/data npm run build:sky
 ```
 
-Stars are stored as compact tuples — `[ra, dec, mag, bv, lightYears, name, designation]` — to keep the bundle small.
+Paketi küçük tutmak için yıldızlar sıkışık demetler hâlinde saklanıyor: `[ra, dec, kadir, bv, ışıkYılı, isim, tanım]`.
 
-## Layout
+## Klasör yapısı
 
 ```
 src/
-  sky/          catalogue, math, ephemeris, scene projection, insights
-  features/     home, open-sky, birth-sky, same-sky, profile
-  components/   mono text, panels, drawn glyphs
-  i18n/         locale tables for en, tr, de, es
-  profiles/     profile model, cities, example people
-  providers/    locale and profile context
+  sky/          katalog, matematik, efemeris, sahne izdüşümü, çıkarımlar
+  features/     ana ekran, gökyüzünü aç, doğum gökyüzü, aynı gökyüzü, profil
+  components/   mono metin, paneller, çizili glifler
+  i18n/         en, tr, de, es dil tabloları
+  profiles/     profil modeli, şehirler, örnek kişiler
+  providers/    dil ve profil bağlamı
 scripts/
   build-sky-data.js
 assets/data/sky.json
 ```
 
-## Performance notes
+## Performans notları
 
-The heavy work is the sky frame: every star and constellation vertex placed for one instant. Two measurements shaped the current code.
+Ağır iş gökyüzü karesi: her yıldızın ve her takımyıldız çizgi noktasının tek bir an için yerleştirilmesi. Bugünkü kodu şu ölçümler şekillendirdi.
 
-- **The frame costs 0.5 ms, not 11.6 ms.** Building each star as `{ ...star, ...horizontal }` spent ~11 ms per frame on 5044 objects; writing the fields out explicitly brought the same work to 0.25 ms, and the whole frame from 11.6 ms to 0.52 ms — measured on desktop V8, with the results agreeing to 1.65e-13 degrees. Object spread, not trigonometry, was the cost.
-- **Projection is vector algebra.** Stars carry their horizontal unit vector, so the telescope projects with dot products and rejects everything behind the tangent plane with a sign test instead of trigonometry per star per frame.
-- **Gestures don't wake the JS thread.** Pan and pinch run as worklets and move the drawn sky on the UI thread; the scene is rebuilt once, when the finger lifts. The scene is built with a margin around the viewport so a drag reveals real stars rather than empty edges.
-- **The time scrubber separates label from sky.** The date label and ruler follow the finger exactly while the sky frame is recomputed on a throttled value, so a fast drag doesn't queue dozens of full sky rebuilds.
-- **The HUD readout is throttled** to ~100 ms and the telescope is memoized, so aiming doesn't re-render the panels around it.
+- **Kare 11.6 ms değil, 0.5 ms.** Her yıldızı `{ ...star, ...horizontal }` diye kurmak 5044 nesne için kare başına ~11 ms harcıyordu; alanları tek tek yazmak aynı işi 0.25 ms'ye, tüm kareyi 11.6 ms'den 0.52 ms'ye indirdi — masaüstü V8'de ölçüldü ve sonuçlar 1.65e-13 derece farkla aynı çıktı. Maliyet trigonometri değil, nesne yayılımıymış.
+- **İzdüşüm vektör cebiri.** Yıldızlar yatay birim vektörlerini taşıyor; teleskop skaler çarpımlarla izdüşürüyor ve teğet düzlemin arkasında kalanları kare başına trigonometri yerine tek bir işaret testiyle atıyor.
+- **Jestler JS thread'ini uyandırmıyor.** Kaydırma ve yakınlaştırma worklet olarak çalışıp çizili gökyüzünü UI thread'inde bir matrisle taşıyor; sahne yalnızca parmak kalkınca yeniden kuruluyor. Aynı gökyüzünün iki gnomonik görüntüsü arasındaki fark tam olarak projektif bir dönüşüm olduğundan bu bir yaklaşıklık değil: yeniden kurulmuş konumlarla 1e-13 piksel uyuşuyor, yani parmak kalktığında gökyüzü zıplamıyor. Sahne ekran kenarlarının ötesine taşacak şekilde kuruluyor ki sürükleme boşluk değil gerçek yıldız açsın.
+- **Zaman şeridi etiketi gökyüzünden ayırıyor.** Tarih etiketi ve cetvel parmağı birebir izlerken gökyüzü karesi kısılmış bir değerle hesaplanıyor; böylece hızlı bir sürükleme arka arkaya onlarca tam gökyüzü hesabını kuyruğa almıyor.
+- **HUD okuması kısılmış** (~100 ms) ve teleskop memoize edilmiş, yani nişan almak çevresindeki panelleri yeniden çizdirmiyor. Sürükleme sırasında rakamlar, yuvarlanmış dereceleri her değiştiğinde UI thread'inden besleniyor.
 
-Dev mode is the slowest thing in the loop; anything measured through Expo Go with the dev server attached is not the speed of the app.
+Döngüdeki en yavaş şey geliştirme kipi; geliştirme sunucusu bağlıyken Expo Go üstünden ölçülen hiçbir şey uygulamanın gerçek hızı değil.
 
-## Credits
+## Kaynak
 
-Star and constellation data from [d3-celestial](https://github.com/ofrohn/d3-celestial) (Hipparcos catalogue, IAU constellation boundaries).
+Yıldız ve takımyıldız verileri [d3-celestial](https://github.com/ofrohn/d3-celestial) projesinden (Hipparcos katalogu, IAU takımyıldız sınırları).
